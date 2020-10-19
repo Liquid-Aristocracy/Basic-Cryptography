@@ -16,6 +16,7 @@ class Window(QtWidgets.QMainWindow):
         self.setWindowTitle("Drawing")
         self.setGeometry(400, 150, self.Width, self.Height)
         # set menu
+        self.drawFunc = lambda: None
         self.menuDrawLine = self.menuBar().addMenu("Line")
         self.menuDrawLine.addAction("DDA...")
         # show
@@ -34,6 +35,12 @@ class Window(QtWidgets.QMainWindow):
         painter.setPen(QtGui.QPen(QtGui.QColor("#000000"), 2, QtCore.Qt.SolidLine))
         painter.drawLine(self.Left, self.Oy, self.Width, self.Oy)
         painter.drawLine(self.Ox, self.Top, self.Ox, self.Height)
+        # draw graph
+        self.drawFunc()
+
+    def myPaint(self, function, *args):
+        self.drawFunc = function(args)
+        self.update
 
 
 if __name__ == '__main__':
