@@ -17,8 +17,10 @@ class Window(QtWidgets.QMainWindow):
         self.setGeometry(400, 150, self.Width, self.Height)
         # set menu
         self.drawFunc = lambda: None
+        self.drawArgs = None
         self.menuDrawLine = self.menuBar().addMenu("Line")
         self.menuDrawLine.addAction("DDA...")
+        self.menuDrawLine.addAction("Bresenham...")
         # show
         self.show
 
@@ -36,11 +38,88 @@ class Window(QtWidgets.QMainWindow):
         painter.drawLine(self.Left, self.Oy, self.Width, self.Oy)
         painter.drawLine(self.Ox, self.Top, self.Ox, self.Height)
         # draw graph
-        self.drawFunc()
+        self.drawFunc(self.drawArgs)
 
     def myPaint(self, function, *args):
-        self.drawFunc = function(args)
-        self.update
+        self.drawFunc = function()
+        self.drawArgs = args
+        self.update()
+
+    def lineDDA(self, x1, y1, x2, y2):
+        # set painter
+        linepainter = QtGui.QPainter()
+        linepainter.begin(self)
+        linepainter.setPen(QtGui.QPen(QtGui.QColor("#990000"), 2, QtCore.Qt.SolidLine))
+        # choose start point
+        if y2 < y1:
+            t = x1
+            x1 = x2
+            x2 = t
+            t = y1
+            y1 = y2
+            y2 = t
+        # DDA
+        xk = x1
+        yk = y1
+        if abs(x1 - x2) > abs(y1 - y2):
+            steps = abs(x1 - x2)
+        else:
+            steps = abs(y1 - y2)
+        dx = (x1 - x2) / steps
+        dy = (y1 - y2) / steps
+        for i in range(steps):
+            linepainter.drawPoint(self, round(xk), round(yk))
+            xk += dx
+            yk += dy
+
+    def lineBresenham(self, x1, y1, x2, y2):
+        # set painter
+        linepainter = QtGui.QPainter()
+        linepainter.begin(self)
+        linepainter.setPen(QtGui.QPen(QtGui.QColor("#990000"), 2, QtCore.Qt.SolidLine))
+        # choose start point
+        if y2 < y1:
+            t = x1
+            x1 = x2
+            x2 = t
+            t = y1
+            y1 = y2
+            y2 = t
+        # Bresenham
+        xk = x1
+        yk = y1
+        if abs(x1 - x2) > abs(y1 - y2):
+            p = 2 * (y1 - y2) - (x1 - x2)
+            delta1 = 2 * (y1 - y2)
+            delta2 = 2 * (y1 - y2) - 2 * (x1 - x2)
+            if x2 > x1:
+                dx = 1
+            else:
+                dx = -1
+            while xk <= x2:
+                linepainter.drawPoint(self, xk, yk)
+                xk += dx
+                if p < 0:
+                    p += delta1
+                else:
+                    yk += 1
+                    p += delta2
+        else:
+            p = 2 * (x1 - x2) - (y1 - y2)
+            delta1 = 2 * (x1 - x2)
+            delta2 = 2 * (x1 - x2) - 2 * (y1 - y2)
+            if y2 > y1:
+                dy = 1
+            else:
+                dy = -1
+            while yk <= y2:
+                linepainter.drawPoint(self, xk, yk)
+                yk += dy
+                if p < 0:
+                    p += delta1
+                else:
+                    yk += 1
+                    p += delta2
 
 
 if __name__ == '__main__':
