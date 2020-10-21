@@ -2,7 +2,12 @@ import sys
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 
+def emptyFunc(self, *args):
+    pass
+
+
 class Window(QtWidgets.QMainWindow):
+
     def __init__(self):
         super().__init__()
         # variables
@@ -16,13 +21,14 @@ class Window(QtWidgets.QMainWindow):
         self.setWindowTitle("Drawing")
         self.setGeometry(400, 150, self.Width, self.Height)
         # set menu
-        self.drawFunc = lambda: None
-        self.drawArgs = None
+        self.drawArgs = ()
+        self.drawFunc = emptyFunc
         self.menuDrawLine = self.menuBar().addMenu("Line")
         self.menuDrawLine.addAction("DDA...")
         self.menuDrawLine.addAction("Bresenham...")
         # show
         self.show
+        print(self.drawFunc)
 
     def paintEvent(self, QPaintEvent):
         painter = QtGui.QPainter()
@@ -38,7 +44,7 @@ class Window(QtWidgets.QMainWindow):
         painter.drawLine(self.Left, self.Oy, self.Width, self.Oy)
         painter.drawLine(self.Ox, self.Top, self.Ox, self.Height)
         # draw graph
-        self.drawFunc(self.drawArgs)
+        self.drawFunc(self, *self.drawArgs)
 
     def myPaint(self, function, *args):
         self.drawFunc = function()
